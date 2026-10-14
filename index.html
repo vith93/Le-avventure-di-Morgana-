@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#dff3e8"><title>La più bella delle avventure</title>
+<style>
+:root{--ink:#294b43;--cream:#fffaf0;--green:#b9dfc5;--pink:#f7cbd4;--gold:#f4ce72}*{box-sizing:border-box}body{margin:0;font-family:ui-rounded,'Trebuchet MS',system-ui,sans-serif;color:var(--ink);background:linear-gradient(#dff3f4,#fff8e9);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}.app{width:min(780px,100%);text-align:center}.eyebrow{letter-spacing:.13em;text-transform:uppercase;font-size:.75rem;font-weight:800;opacity:.7}.panel{background:#ffffffd9;border:2px solid #fff;border-radius:24px;padding:clamp(16px,4vw,28px);box-shadow:0 14px 40px #365d4a18}.title{font-size:clamp(2rem,7vw,3.3rem);line-height:1.02;margin:10px 0;color:#315e50}.sub{line-height:1.5;max-width:560px;margin:12px auto 20px}.btn{border:0;border-radius:999px;padding:14px 22px;background:#39765f;color:white;font-size:1rem;font-weight:800;cursor:pointer;box-shadow:0 5px 0 #245441;touch-action:manipulation}.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #245441}.game-wrap{position:relative;margin:14px auto 10px;overflow:hidden;border-radius:20px;border:3px solid #fff;box-shadow:0 8px 25px #315e5020;background:#ccebe5}canvas{display:block;width:100%;height:auto;touch-action:manipulation}.hud{display:flex;justify-content:space-between;font-weight:800;font-size:.9rem;margin:8px 2px}.controls{display:flex;justify-content:center;gap:14px;margin-top:10px}.control{width:76px;height:58px;border:0;border-radius:18px;background:#ffffffd9;color:#315e50;font-size:1.45rem;font-weight:900;box-shadow:0 4px 0 #bad7c8;touch-action:manipulation}.hidden{display:none!important}.message{font-size:clamp(1.4rem,5vw,2.5rem);line-height:1.2;color:#315e50;margin:12px 0}.heart{font-size:3rem;animation:pulse 1.1s infinite}@keyframes pulse{50%{transform:scale(1.15)}}.note{font-size:.8rem;opacity:.68;margin:12px 0 0}.stars{color:#d99b28;letter-spacing:.3em;font-size:1.3rem}.stage-pill{display:inline-block;background:#e5f4e9;padding:7px 12px;border-radius:99px;font-weight:800;font-size:.8rem}
+</style></head><body><main class="app"><section id="intro" class="panel"><div class="eyebrow">Una piccola avventura</div><div style="font-size:3rem;margin:8px">🐾 🌼 ⭐</div><h1 class="title">La più bella<br>delle avventure</h1><p class="sub">Un piccolo viaggio ti aspetta. Aiuta Morgana a saltare gli ostacoli, raccogliere le stelline e raggiungere la fine del percorso per scoprire la tua sorpresa.</p><button class="btn" id="start">Inizia l'avventura ✨</button><p class="note">Si gioca anche dal telefono · Aiuta Morgana: tocca SALTA per superare gli ostacoli</p></section>
+<section id="play" class="panel hidden"><div class="hud"><span id="level">Livello 1 di 2</span><span>⭐ <span id="score">0</span>/8</span></div><div class="game-wrap"><canvas id="game" width="720" height="360" aria-label="Morgana corre e salta in un videogioco a piattaforme"></canvas></div><div class="controls"><button class="control" id="left" aria-label="Sinistra">◀</button><button class="control" id="jump">SALTA ↑</button><button class="control" id="right" aria-label="Destra">▶</button></div><p class="note">Raccogli le stelline e raggiungi la bandierina. Hai tutte le vite che ti servono: riprova se cadi!</p></section>
+<section id="between" class="panel hidden"><div class="stars">✦ ✧ ✦</div><h2 class="title" style="font-size:2.3rem">Che bella avventura!</h2><p class="sub">Hai superato la prima tappa. Le sorprese più belle arrivano a chi continua il viaggio…</p><button class="btn" id="next">Prosegui ✨</button></section>
+<section id="win" class="panel hidden"><div class="heart">💛</div><div class="eyebrow">Hai trovato il tesoro più prezioso</div><h2 class="message">La nostra famiglia<br>sta per crescere!</h2><div style="font-size:4rem;margin:14px">👶🏻🍼✨</div><p class="sub" style="font-size:1.1rem">Una nuova piccola avventura sta per cominciare…<br><strong>Io e Nicole aspettiamo un bambino! ❤️</strong></p><p class="sub">Presto saremo in tre (più Morgana, naturalmente 🐾).</p><button class="btn" id="again">Rigioca</button><p class="note">Con tutto il nostro amore ❤️</p></section></main>
+<script>
+const $=id=>document.getElementById(id);const intro=$('intro'),play=$('play'),between=$('between'),win=$('win'),canvas=$('game'),ctx=canvas.getContext('2d');let level=1,score=0,x=45,y=250,vy=0,ground=290,move=0,frame=0,stars=[],obstacles=[],goal=690,won=false,anim;const W=720,H=360;
+function show(which){[intro,play,between,win].forEach(s=>s.classList.add('hidden'));which.classList.remove('hidden')}
+function setup(l){level=l;x=45;y=ground-38;vy=0;move=0;frame=0;won=false;stars=[];obstacles=[];let positions=l===1?[150,240,340,455,560,635]:[130,220,310,410,510,600,665];positions.forEach((sx,i)=>stars.push({x:sx,y:210-(i%3)*42,taken:false}));obstacles=(l===1?[195,390,530]:[170,285,390,500,610]).map((ox,i)=>({x:ox,w:28+(i%2)*9,h:24+(i%2)*12}));$('level').textContent=`Livello ${l} di 2`;draw()}
+function start(){score=0;$('score').textContent=score;setup(1);show(play);cancelAnimationFrame(anim);loop()}
+function jump(){if(!play.classList.contains('hidden')&&y>=ground-39){vy=-11.7}}
+$('start').onclick=start;$('next').onclick=()=>{setup(2);show(play);loop()};$('again').onclick=()=>show(intro);$('jump').onpointerdown=e=>{e.preventDefault();jump()};$('left').onpointerdown=()=>move=-1;$('right').onpointerdown=()=>move=1;['left','right'].forEach(id=>$(id).onpointerup=()=>move=0);window.addEventListener('pointerup',()=>move=0);window.addEventListener('keydown',e=>{if(['ArrowUp',' ','w','W'].includes(e.key)){e.preventDefault();jump()}if(e.key==='ArrowLeft')move=-1;if(e.key==='ArrowRight')move=1});window.addEventListener('keyup',e=>{if(['ArrowLeft','ArrowRight'].includes(e.key))move=0});
+function rounded(x,y,w,h,r,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function draw(){ctx.clearRect(0,0,W,H);let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#bfe9ef');sky.addColorStop(1,'#fff1d5');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff9e8';[[90,58,24],[300,84,18],[560,48,26]].forEach(([cx,cy,r])=>{ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.arc(cx+r,cy+5,r*.8,0,Math.PI*2);ctx.arc(cx-r,cy+7,r*.7,0,Math.PI*2);ctx.fill()});ctx.fillStyle='#9ed4b3';ctx.beginPath();ctx.moveTo(0,250);ctx.quadraticCurveTo(130,160,270,250);ctx.quadraticCurveTo(420,170,560,245);ctx.quadraticCurveTo(650,200,720,240);ctx.lineTo(720,360);ctx.lineTo(0,360);ctx.fill();ctx.fillStyle='#6eaf83';ctx.fillRect(0,ground,W,H-ground);ctx.fillStyle='#8cc995';for(let i=0;i<30;i++){let gx=(i*31+frame*.3)%W;ctx.fillRect(gx,ground+10,3,5)}
+// finish flag
+ctx.fillStyle='#fff';ctx.fillRect(675,ground-75,5,75);ctx.fillStyle='#f2a9bd';ctx.beginPath();ctx.moveTo(680,ground-74);ctx.lineTo(710,ground-62);ctx.lineTo(680,ground-50);ctx.fill();
+stars.forEach(s=>{if(s.taken)return;ctx.save();ctx.translate(s.x,s.y);ctx.rotate(frame*.025);ctx.fillStyle='#ffcf57';ctx.strokeStyle='#fff6c8';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<10;i++){let a=-Math.PI/2+i*Math.PI/5,r=i%2?7:15;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()});obstacles.forEach(o=>{rounded(o.x,ground-o.h,o.w,o.h,8,'#b97865');ctx.fillStyle='#d69a7e';ctx.beginPath();ctx.arc(o.x+o.w/2,ground-o.h+4,5,Math.PI,0);ctx.fill()});
+// Morgana: cagnolina da pastore tigrata grigio-nera, orecchie dritte e occhi ambrati
+ctx.save();
+// coda scodinzolante
+ctx.strokeStyle='#343a3a';ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x+8,y+22);ctx.quadraticCurveTo(x-3,y+12+Math.sin(frame*.25)*4,x-7,y+19+Math.sin(frame*.25)*5);ctx.stroke();
+// corpo e zampe
+rounded(x+5,y+13,30,17,8,'#454b4a');
+ctx.strokeStyle='#252d2d';ctx.lineWidth=3;
+[[x+11,y+26,x+9,y+34],[x+19,y+26,x+19,y+34],[x+29,y+25,x+31,y+33]].forEach(a=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(a[2],a[3]);ctx.stroke()});
+// striature tigrate sul mantello
+ctx.strokeStyle='#202828';ctx.lineWidth=2.4;
+[[x+12,y+15,x+16,y+21],[x+20,y+14,x+23,y+20],[x+27,y+15,x+30,y+20],[x+16,y+22,x+20,y+26]].forEach(a=>{ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(a[2],a[3]);ctx.stroke()});
+// collo e testa
+ctx.fillStyle='#555b58';ctx.beginPath();ctx.ellipse(x+33,y+15,10,10,-.15,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#343a39';ctx.beginPath();ctx.ellipse(x+39,y+10,10,10,-.2,0,Math.PI*2);ctx.fill();
+// orecchie appuntite
+ctx.beginPath();ctx.moveTo(x+31,y+5);ctx.lineTo(x+30,y-7);ctx.lineTo(x+38,y+2);ctx.closePath();ctx.fill();
+ctx.beginPath();ctx.moveTo(x+39,y+3);ctx.lineTo(x+46,y-5);ctx.lineTo(x+45,y+8);ctx.closePath();ctx.fill();
+ctx.fillStyle='#9a7770';ctx.beginPath();ctx.moveTo(x+33,y+1);ctx.lineTo(x+32,y-3);ctx.lineTo(x+36,y+2);ctx.closePath();ctx.fill();
+// muso, guance e naso
+ctx.fillStyle='#a9a99c';ctx.beginPath();ctx.ellipse(x+43,y+14,8,5,.1,0,Math.PI*2);ctx.fill();
+ctx.fillStyle='#222827';ctx.beginPath();ctx.ellipse(x+49,y+12,3,2.5,0,0,Math.PI*2);ctx.fill();
+// occhio ambrato
+ctx.fillStyle='#e7b65c';ctx.beginPath();ctx.arc(x+40,y+8,2.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#171d1c';ctx.beginPath();ctx.arc(x+40.5,y+8,1.1,0,Math.PI*2);ctx.fill();
+// bocca e lingua felice
+ctx.strokeStyle='#202625';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x+42,y+17);ctx.quadraticCurveTo(x+46,y+20,x+49,y+16);ctx.stroke();
+ctx.fillStyle='#e88796';ctx.beginPath();ctx.ellipse(x+45,y+19,2.3,3.2,.25,0,Math.PI*2);ctx.fill();
+// piccolo collarino verde salvia
+ctx.strokeStyle='#8fc6a4';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+30,y+20);ctx.lineTo(x+36,y+23);ctx.stroke();
+ctx.restore();}
+function loop(){if(play.classList.contains('hidden'))return;frame++;x+=move*3.3;x=Math.max(0,Math.min(W-30,x));vy+=.52;y+=vy;if(y>ground-38){y=ground-38;vy=0}let hit=obstacles.some(o=>x+25>o.x&&x+4<o.x+o.w&&y+31>ground-o.h&&y+25<ground);if(hit){x=Math.max(20,x-2.7)}stars.forEach(s=>{if(!s.taken&&Math.abs((x+15)-s.x)<22&&Math.abs((y+15)-s.y)<23){s.taken=true;score++;$('score').textContent=score}});draw();if(x>655){if(level===1){show(between);return}else{show(win);return}}anim=requestAnimationFrame(loop)}
+setup(1);draw();
+</script></body></html>
